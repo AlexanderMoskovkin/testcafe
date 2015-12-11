@@ -1,0 +1,14 @@
+{
+  "env": {
+    "mocha": true,
+    "browser": true,
+    "jquery": true
+  },
+  "globals": {
+    /* testcafe api */
+    "ok": true,
+    "notOk":true,
+    "eq": true,
+    "act": true
+  }
+}
