@@ -80,7 +80,7 @@
     "serve-static": "^1.10.0",
     "saucelabs-connector": "^0.0.2",
     "tmp": "0.0.28",
-    "cross-spawn-async": "^2.1.6"
+    "cross-spawn-async": "^2.1.7"
   },
   "files": [
     "lib",
