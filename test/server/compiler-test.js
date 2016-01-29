@@ -409,4 +409,85 @@ describe('Compiler', function () {
                 });
         });
     });
+
+    describe('Raw data compiler', function () {
+        it('Should compile test files', function () {
+            var sources = ['test/server/data/test-suites/raw/test.testcafe'];
+
+            return compile(sources)
+                .then(function (compiled) {
+                    var testfile = resolve('test/server/data/test-suites/raw/test.testcafe');
+                    var tests    = compiled.tests;
+                    var fixtures = compiled.fixtures;
+
+                    expect(tests.length).eql(3);
+                    expect(fixtures.length).eql(2);
+
+                    expect(fixtures[0].name).eql('Fixture1');
+                    expect(fixtures[0].path).eql(testfile);
+                    expect(fixtures[0].page).eql('about:blank');
+
+                    expect(fixtures[1].name).eql('Fixture2');
+                    expect(fixtures[1].path).eql(testfile);
+                    expect(fixtures[1].page).eql('http://example.org');
+
+                    expect(tests[0].name).eql('Fixture1Test1');
+                    expect(tests[0].fixture).eql(fixtures[0]);
+
+                    expect(tests[1].name).eql('Fixture1Test2');
+                    expect(tests[1].fixture).eql(fixtures[0]);
+
+                    expect(tests[2].name).eql('Fixture2Test1');
+                    expect(tests[2].fixture).eql(fixtures[1]);
+                });
+        });
+
+        var TestRunMock = function (expectedError) {
+            this.commands      = [];
+            this.expectedError = expectedError;
+        };
+
+        TestRunMock.prototype.executeCommand = function (command) {
+            this.commands.push(command);
+
+            return this.expectedError ? Promise.reject(this.expectedError) : Promise.resolve();
+        };
+
+        it('Should provide test.fn function and resolve it if the test succeed', function () {
+            var sources = ['test/server/data/test-suites/raw/test.testcafe'];
+            var test    = null;
+            var testRun = new TestRunMock();
+
+            return compile(sources)
+                .then(function (compiled) {
+                    test = compiled.tests[0];
+
+                    return test.fn(testRun);
+                })
+                .then(function () {
+                    expect(testRun.commands.length).eql(2);
+                });
+        });
+
+        it('Should provide test.fn function and reject it if the test failed', function () {
+            var sources       = ['test/server/data/test-suites/raw/test.testcafe'];
+            var test          = null;
+            var expectedError = 'test-error';
+            var testRun       = new TestRunMock(expectedError);
+
+            return compile(sources)
+                .then(function (compiled) {
+                    test = compiled.tests[0];
+
+                    return test.fn(testRun);
+                })
+                .then(function () {
+                    throw 'test.fn() should be rejected but it is resolved';
+                })
+                .catch(function (err) {
+                    expect(err).eql(expectedError);
+                    expect(testRun.commands.length).eql(1);
+                });
+        });
+    });
 });
