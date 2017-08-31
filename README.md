@@ -11,7 +11,7 @@
 </p>
 
 <p align="center">
-[![Build Status](https://travis-ci.org/DevExpress/testcafe.svg?branch=master)](https://travis-ci.org/DevExpress/testcafe)
+<a href="https://github.com/DevExpress/testcafe"><img alt="Tested with TestCafe" src="https://img.shields.io/badge/tested%20with-TestCafe-blue.svg"></a>    
     
 <a href="https://ci.appveyor.com/project/DevExpress/testcafe"><img alt="Functional Windows desktop" src="https://ci.appveyor.com/api/projects/status/ftelkyuiji8lyadf?svg=true"></a>
 <a href="https://travis-ci.org/DevExpress/testcafe"><img alt="All Travis tasks (server, client, functional: mobile, macOS, Edge)" src="https://travis-ci.org/DevExpress/testcafe.svg"></a>
