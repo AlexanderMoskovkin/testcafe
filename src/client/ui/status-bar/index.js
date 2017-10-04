@@ -47,9 +47,9 @@ const DEBUGGING_TEXT                       = 'Debugging test...';
 const TEST_FAILED_TEXT                     = 'Test failed';
 const UNLOCK_PAGE_TEXT                     = 'Unlock page';
 const PAGE_UNLOCKED_TEXT                   = 'Page unlocked';
-const MIDDLE_WINDOW_WIDTH                  = 720;
+const MIDDLE_WINDOW_WIDTH                  = 940;
 const SMALL_WINDOW_WIDTH                   = 380;
-const SMALL_WINDOW_WIDTH_IN_DEBUGGING      = 540;
+const SMALL_WINDOW_WIDTH_IN_DEBUGGING      = 740;
 const ONLY_BUTTONS_WIDTH                   = 330;
 const SHOWING_DELAY                        = 300;
 const ANIMATION_DELAY                      = 500;
@@ -137,7 +137,9 @@ export default class StatusBar {
             unlockText.textContent = PAGE_UNLOCKED_TEXT;
         });
 
-        return unlockPageContainer;
+        unlockPageArea.style.display = 'none';
+
+        return unlockPageArea;
     }
 
     _createStatusArea () {
@@ -281,8 +283,10 @@ export default class StatusBar {
         var statusDivWidth     = styleUtils.getWidth(this.statusDiv);
         var marginLeft         = containerWidth / 2 - statusDivWidth / 2 - infoContainerWidth;
 
-        if (this.debugging)
+        if (this.debugging) {
             marginLeft -= styleUtils.getWidth(this.buttons) / 2;
+            marginLeft -= styleUtils.getWidth(this.unlockPageArea) / 2;
+        }
 
         styleUtils.set(this.statusDiv, 'marginLeft', Math.max(Math.round(marginLeft), 0) + 'px');
     }
@@ -392,10 +396,10 @@ export default class StatusBar {
     }
 
     _resetState () {
-        //TODO: reset lock button
         this.debugging = false;
 
         this.buttons.style.display = 'none';
+        this.unlockPageArea.style.display = 'none';
 
         this.statusDiv.textContent = '';
         this.progressBar.hide();
@@ -442,7 +446,8 @@ export default class StatusBar {
             else
                 this.statusDiv.textContent = DEBUGGING_TEXT;
 
-            this.buttons.style.display = 'inline-block';
+            this.buttons.style.display        = 'inline-block';
+            this.unlockPageArea.style.display = 'inline-block';
 
             this._recalculateSizes();
 
