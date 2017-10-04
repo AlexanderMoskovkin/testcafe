@@ -378,9 +378,55 @@
 
                 .status {
                     display: inline-block;
-                    margin-top: 6px;
+                    margin-top: 7px;
                     color: #36B6E5;
                     line-height: 27px;
+                }
+
+                .unlock-page-area {
+                  display: inline-block;
+                  margin-left: 21px;
+
+                  .unlock-page-container {
+                    &.locked {
+                      border: 1px solid #36B6E5;
+                      .rounded-corners(3px);
+
+                      cursor: pointer;
+
+                      .unlock-icon {
+                        cursor: pointer;
+                      }
+
+                      span {
+                        cursor: pointer;
+                      }
+                    }
+
+                    border-left: 1px solid rgba(66,173,223,0.5);
+
+                    position: relative;
+                    top: 3px;
+                    padding: 0 14px 1px;
+
+                    .unlock-icon {
+                      .sprite-icon();
+
+                      display: inline-block;
+                      width: 12px;
+                      height: 16px;
+                      background-position: -54px -64px;
+                    }
+
+                    span {
+                      position: relative;
+                      top: -3px;
+                      margin-left: 10px;
+
+                      font-size: 13px;
+                      color: #36B6E5;
+                    }
+                  }
                 }
 
                 .buttons {
@@ -394,9 +440,9 @@
                     .button {
                         .rounded-corners(3px);
 
-                        font-size: 12px;
+                        font-size: 13px;
                         width: auto;
-                        padding: 0 15px 0 15px;
+                        padding: 0 16px;
                         float: none;
                         display: inline-block;
 
@@ -434,7 +480,7 @@
                             background-color: #51B7E7;
 
                             span {
-                                padding-right: 6px;
+                                padding-right: 7px;
                             }
 
                             .button-icon {
@@ -447,15 +493,17 @@
                         &.step {
                             background-color: #38A3D5;
                             margin-left: 5px;
+                            padding: 0 14px;
 
                             span {
-                                padding-right: 6px;
+                                padding-left: 4px;
+                                padding-right: 1px;
                             }
 
                             .button-icon {
-                                width: 25px;
+                                width: 29px;
                                 height: 18px;
-                                background-position: -15px -64px;
+                                background-position: -20px -64px;
                             }
                         }
                     }

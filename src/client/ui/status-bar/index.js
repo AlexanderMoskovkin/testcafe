@@ -25,6 +25,10 @@ const FIXTURE_CONTAINER_CLASS              = 'fixture-container';
 const FIXTURE_DIV_CLASS                    = 'fixture';
 const USER_AGENT_DIV_CLASS                 = 'user-agent';
 const STATUS_CONTAINER_CLASS               = 'status-container';
+const UNLOCK_PAGE_AREA_CLASS               = 'unlock-page-area';
+const UNLOCK_PAGE_CONTAINER_CLASS          = 'unlock-page-container';
+const UNLOCK_ICON_CLASS                    = 'unlock-icon';
+const LOCKED_CLASS                         = 'locked';
 const BUTTONS_CLASS                        = 'buttons';
 const BUTTON_ICON_CLASS                    = 'button-icon';
 const RESUME_BUTTON_CLASS                  = 'resume';
@@ -41,6 +45,8 @@ const WAITING_FOR_ELEMENT_TEXT             = 'Waiting for an element to appear..
 const WAITING_FOR_ASSERTION_EXECUTION_TEXT = 'Waiting for an assertion execution...';
 const DEBUGGING_TEXT                       = 'Debugging test...';
 const TEST_FAILED_TEXT                     = 'Test failed';
+const UNLOCK_PAGE_TEXT                     = 'Unlock page';
+const PAGE_UNLOCKED_TEXT                   = 'Page unlocked';
 const MIDDLE_WINDOW_WIDTH                  = 720;
 const SMALL_WINDOW_WIDTH                   = 380;
 const SMALL_WINDOW_WIDTH_IN_DEBUGGING      = 540;
@@ -84,6 +90,7 @@ export default class StatusBar {
     _createFixtureArea () {
         this.infoContainer = document.createElement('div');
         shadowUI.addClass(this.infoContainer, INFO_CONTAINER_CLASS);
+        shadowUI.addClass(this.infoContainer, INFO_CONTAINER_CLASS);
         this.container.appendChild(this.infoContainer);
 
         this.icon = document.createElement('div');
@@ -107,6 +114,32 @@ export default class StatusBar {
         this.fixtureContainer.appendChild(userAgentDiv);
     }
 
+    _createUnlockPageArea (container) {
+        var unlockPageArea      = document.createElement('div');
+        var unlockPageContainer = document.createElement('div');
+        var unlockIcon          = document.createElement('div');
+        var unlockText          = document.createElement('span');
+
+        unlockText.textContent = UNLOCK_PAGE_TEXT;
+
+        shadowUI.addClass(unlockPageArea, UNLOCK_PAGE_AREA_CLASS);
+        shadowUI.addClass(unlockPageContainer, UNLOCK_PAGE_CONTAINER_CLASS);
+        shadowUI.addClass(unlockPageContainer, LOCKED_CLASS);
+        shadowUI.addClass(unlockIcon, UNLOCK_ICON_CLASS);
+
+        container.appendChild(unlockPageArea);
+        unlockPageArea.appendChild(unlockPageContainer);
+        unlockPageContainer.appendChild(unlockIcon);
+        unlockPageContainer.appendChild(unlockText);
+
+        this._bindClickOnce([unlockPageContainer], () => {
+            shadowUI.removeClass(unlockPageContainer, LOCKED_CLASS);
+            unlockText.textContent = PAGE_UNLOCKED_TEXT;
+        });
+
+        return unlockPageContainer;
+    }
+
     _createStatusArea () {
         var statusContainer = document.createElement('div');
 
@@ -119,12 +152,14 @@ export default class StatusBar {
         shadowUI.addClass(this.statusDiv, STATUS_DIV_CLASS);
         statusContainer.appendChild(this.statusDiv);
 
+        this.unlockPageArea = this._createUnlockPageArea(statusContainer);
+
         this.buttons = document.createElement('div');
         shadowUI.addClass(this.buttons, BUTTONS_CLASS);
         statusContainer.appendChild(this.buttons);
 
         this.resumeButton = this._createButton('Resume', RESUME_BUTTON_CLASS);
-        this.stepButton   = this._createButton('Step', STEP_CLASS);
+        this.stepButton   = this._createButton('Next Step', STEP_CLASS);
         this.finishButton = this._createButton('Finish', RESUME_BUTTON_CLASS);
 
         this.buttons.appendChild(this.resumeButton);
@@ -318,6 +353,25 @@ export default class StatusBar {
         });
     }
 
+    _bindClickOnce (elements, handler) {
+        var eventName = featureDetection.isTouchDevice ? 'touchstart' : 'mousedown';
+
+        var downHandler = e => {
+            var isTargetElement = !!elements.find(el => domUtils.containsElement(el, e.target));
+
+            if (isTargetElement) {
+                eventUtils.preventDefault(e);
+                listeners.removeInternalEventListener(window, [eventName], downHandler);
+
+                handler(e);
+            }
+            else if (domUtils.containsElement(this.statusBar, e.target))
+                eventUtils.preventDefault(e);
+        };
+
+        listeners.addInternalEventListener(window, [eventName], downHandler);
+    }
+
     _initChildListening () {
         messageSandbox.on(messageSandbox.SERVICE_MSG_RECEIVED_EVENT, e => {
             var msg = e.message;
@@ -338,6 +392,7 @@ export default class StatusBar {
     }
 
     _resetState () {
+        //TODO: reset lock button
         this.debugging = false;
 
         this.buttons.style.display = 'none';
@@ -391,24 +446,12 @@ export default class StatusBar {
 
             this._recalculateSizes();
 
-            var eventName = featureDetection.isTouchDevice ? 'touchstart' : 'mousedown';
+            this._bindClickOnce([this.resumeButton, this.stepButton, this.finishButton], e => {
+                var isStepButton = domUtils.containsElement(this.stepButton, e.target);
 
-            var downHandler = e => {
-                var isResumeButton = domUtils.containsElement(this.resumeButton, e.target);
-                var isStepButton   = domUtils.containsElement(this.stepButton, e.target);
-                var isFinishButton = domUtils.containsElement(this.finishButton, e.target);
-
-                if (isResumeButton || isStepButton || isFinishButton) {
-                    eventUtils.preventDefault(e);
-                    this._resetState();
-                    listeners.removeInternalEventListener(window, [eventName], downHandler);
-                    resolve(isStepButton);
-                }
-                else if (domUtils.containsElement(this.statusBar, e.target))
-                    eventUtils.preventDefault(e);
-            };
-
-            listeners.addInternalEventListener(window, [eventName], downHandler);
+                this._resetState();
+                resolve(isStepButton);
+            });
         });
     }
 
