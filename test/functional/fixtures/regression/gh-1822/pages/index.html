@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>testcafe bug</title>
+    <style>
+        .container {
+            padding: 20px;
+            border: 1px solid black;
+        }
+
+        #parent:hover {
+            background-color: yellow;
+        }
+
+        #child:hover {
+            background-color: red;
+        }
+    </style>
+</head>
+<body>
+<div id="parent" class="container">
+    <div id="child" class="container">
+        <iframe id="iframe" src="iframe.html"></iframe>
+    </div>
+</div>
+</body>

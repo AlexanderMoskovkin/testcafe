@@ -4,6 +4,8 @@ import MoveEventSequenceBase from './base';
 
 var eventSimulator = hammerhead.eventSandbox.eventSimulator;
 var extend         = hammerhead.utils.extend;
+var browserUtils   = hammerhead.utils.browser;
+
 
 class MoveEventSequence extends MoveEventSequenceBase {
     leaveElement (currentElement, prevElement, commonAncestor, options) {
@@ -22,6 +24,10 @@ class MoveEventSequence extends MoveEventSequenceBase {
     }
 
     enterElement (currentElement, prevElement, commonAncestor, options) {
+        // gh-1822
+        if (domUtils.isIframeElement(currentElement) && browserUtils.isIE)
+            return;
+
         eventSimulator.mouseover(currentElement, extend({ relatedTarget: prevElement }, options));
 
         var currentParent      = currentElement;
