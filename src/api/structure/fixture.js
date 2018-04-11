@@ -17,6 +17,8 @@ export default class Fixture extends TestingUnit {
         this.beforeFn = null;
         this.afterFn  = null;
 
+        this.meta = {};
+
         return this.apiOrigin;
     }
 
@@ -59,6 +61,18 @@ export default class Fixture extends TestingUnit {
         assertType(is.function, 'afterEach', 'fixture.afterEach hook', fn);
 
         this.afterEachFn = wrapTestFunction(fn);
+
+        return this.apiOrigin;
+    }
+
+    _meta$ () {
+        assertType([is.string, is.nonNullObject], 'meta', 'fixture.meta', arguments[0]);
+
+        const data = typeof arguments[0] === 'string' ? { [arguments[0]]: arguments[1] } : arguments[0];
+
+        Object.keys(data).forEach(key => {
+            this.meta[key] = data[key];
+        });
 
         return this.apiOrigin;
     }

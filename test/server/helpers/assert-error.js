@@ -47,6 +47,9 @@ function assertError (err, expected) {
 function assertAPIError (err, expected) {
     assertError(err, expected);
 
+    console.log(err.stack);
+    console.log(expected.callsite);
+
     expect(err.stack.indexOf(expected.message + '\n\n' + expected.callsite)).eql(0);
     expect(stripAnsi(err.coloredStack)).eql(err.stack);
 }
